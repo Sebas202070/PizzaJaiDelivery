@@ -4,7 +4,7 @@ import { BsCartFill } from 'react-icons/bs';
 const PizzaCard = ({ pizza }) => {
   return (
     <div className="bg-white rounded-lg p-1 flex flex-col items-center shadow-md hover:shadow-lg transition-shadow duration-300">
-      <div className="w-full h-48 relative"> {/* Contenedor con dimensiones fijas */}
+      <div className="w-80 h-48 relative"> {/* Contenedor con dimensiones fijas */}
         <Image
           src={pizza.image}
           alt={pizza.name}
