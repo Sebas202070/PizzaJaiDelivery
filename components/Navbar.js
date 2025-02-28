@@ -12,17 +12,17 @@ const Navbar = () => {
       <div className="container mx-auto flex justify-between items-center">
         <Link href="/" className="flex items-center">
           <Image src="/images/pizza-jai-logo.jpg" alt="Pizza Jai Logo" width={50} height={50} className="mr-2" />
-          <span className="text-white font-bold text-xl">Pizza Jai Delivery</span>
+          <span className="text-white font-bold text-xl  text-shadow-red">Pizza Jai Delivery</span>
         </Link>
         <div className="flex items-center space-x-4">
-          <Link href="/productos" className="text-white">Productos</Link>
+          <Link href="/productos" className="text-white  text-shadow-red">Productos</Link>
           <Link href="/carrito" className="text-white">
             <BsCartFill size={24} />
           </Link>
           {session ? (
-            <button onClick={() => signOut()} className="text-white">Cerrar Sesión</button>
+            <button onClick={() => signOut()} className="text-white  text-shadow-red">Cerrar Sesión</button>
           ) : (
-            <Link href="/registro" className="text-white">Iniciar Sesión</Link>
+            <Link href="/registro" className="text-white  text-shadow-red">Iniciar Sesión</Link>
           )}
         </div>
       </div>

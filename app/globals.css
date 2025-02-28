@@ -33,3 +33,7 @@ body {
 .flex-grow {
   flex-grow: 1;
 }
+
+.text-shadow-red {
+  text-shadow: 1px 1px 2px red, -1px -1px 2px red;
+}

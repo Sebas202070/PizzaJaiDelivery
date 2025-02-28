@@ -3,9 +3,9 @@ import { BsCartFill } from 'react-icons/bs';
 
 const PizzaCard = ({ pizza }) => {
   return (
-    <div className="bg-white rounded-lg p-4 flex flex-col items-center shadow-md hover:shadow-lg transition-shadow duration-300">
-      <Image src={pizza.image} alt={pizza.name} width={200} height={100} className="rounded-t-lg" />
-      <div className="p-4">
+    <div className="bg-white rounded-lg p-1 flex flex-col items-center shadow-md hover:shadow-lg transition-shadow duration-300">
+      <Image src={pizza.image} alt={pizza.name} width={270} height={150} className="rounded-t-lg" />
+      <div className="p-0">
         <h3 className="text-xl font-semibold mb-2">{pizza.name}</h3>
         <p className="text-gray-600 text-center mb-2">{pizza.description}</p>
         <p className="font-bold text-lg mb-4">${pizza.price}</p>

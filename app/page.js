@@ -72,11 +72,13 @@ export default function Home() {
     <div className="relative">
       <div className="fixed inset-0 z-[-1]">
         <Image src="/images/pizza1.jpg" alt="" layout="fill" objectFit="cover" /> {/* Imagen de fondo aquí */}
-        <div className="absolute inset-0 bg-black opacity-50"></div>
+        <div className="absolute inset-0 bg-black opacity-40"></div>
       </div>
       <div className="relative inset-0 flex flex-col items-center min-h-screen mt-2"> {/* Margen positivo */}
-        <h1 className="text-white text-6xl font-bold text-center">¡Bienvenido a Pizza Jai Delivery!</h1>
-        <h2 className="text-white text-3xl font-bold mt-4 text-center">¡Hace tu pedido ya!</h2>
+        <h1 className="text-white text-6xl font-bold text-center text-shadow-red">¡Bienvenido a Pizza Jai Delivery!</h1>
+        <h2 className="text-white text-3xl font-bold mt-4 text-center text-shadow-red">Elegi de entre mas de nuestras 20 exquisitas variedades</h2>
+        <h2 className="text-white text-3xl font-bold mt-4 text-center text-shadow-red">¡y Hace tu pedido ya!</h2>
+        
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8 mb-12">
           {pizzas.map((pizza) => (
             <PizzaCard key={pizza.id} pizza={pizza} />
