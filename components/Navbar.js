@@ -12,7 +12,7 @@ const Navbar = () => {
       <div className="container mx-auto flex justify-between items-center">
         <Link href="/" className="flex items-center">
           <Image src="/images/pizza-jai-logo.jpg" alt="Pizza Jai Logo" width={50} height={50} className="mr-2" />
-          <span className="text-white font-bold text-xl">Pizza Jai</span>
+          <span className="text-white font-bold text-xl">Pizza Jai Delivery</span>
         </Link>
         <div className="flex items-center space-x-4">
           <Link href="/productos" className="text-white">Productos</Link>
