@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSession, signIn, signOut } from 'next-auth/react';
-import { BsCartFill } from 'react-icons/bs'; // Importa el icono del carrito
+import { BsCartFill } from 'react-icons/bs';
 
 const Navbar = () => {
   const { data: session } = useSession();
@@ -15,19 +15,15 @@ const Navbar = () => {
           <span className="text-white font-bold text-xl">Pizza Jai</span>
         </Link>
         <div className="flex items-center space-x-4">
-          
-        
-          
+          <Link href="/productos" className="text-white">Productos</Link>
+          <Link href="/carrito" className="text-white">
+            <BsCartFill size={24} />
+          </Link>
           {session ? (
             <button onClick={() => signOut()} className="text-white">Cerrar Sesión</button>
           ) : (
             <Link href="/registro" className="text-white">Iniciar Sesión</Link>
           )}
-
-<Link href="/productos" className="text-white">Productos</Link>
-          <Link href="/carrito" className="text-white">
-            <BsCartFill size={24} /> {/* Icono del carrito */}
-          </Link>
         </div>
       </div>
     </nav>
