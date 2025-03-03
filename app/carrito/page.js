@@ -2,6 +2,8 @@
 import { useContext } from 'react';
 import { CartContext } from '../context/CartContext';
 import Image from 'next/image';
+import PaymentButton from '@/components/PaymentButton';
+
 
 const Carrito = () => {
   const { cartItems, removeFromCart } = useContext(CartContext);
@@ -37,7 +39,7 @@ const Carrito = () => {
           </ul>
           <div className="mt-4">
             <h2 className="text-xl font-semibold">Total: ${calculateTotal()}</h2>
-            <button className="bg-green-500 text-white p-2 rounded mt-4">Realizar Pago</button>
+            {cartItems.length > 0 && <PaymentButton cartItems={cartItems} />} {/* Agrega el botón de pago */}
           </div>
         </div>
       )}
