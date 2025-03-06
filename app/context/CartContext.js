@@ -18,7 +18,15 @@ export const CartProvider = ({ children }) => {
   }, [cartItems]);
 
   const addToCart = (pizza) => {
-    setCartItems([...cartItems, pizza]);
+    const existingItemIndex = cartItems.findIndex((item) => item.name === pizza.name);
+
+    if (existingItemIndex !== -1) {
+      const updatedCart = [...cartItems];
+      updatedCart[existingItemIndex].cantidad += 1;
+      setCartItems(updatedCart);
+    } else {
+      setCartItems([...cartItems, { ...pizza, cantidad: 1 }]);
+    }
   };
 
   const removeFromCart = (index) => {
@@ -27,8 +35,48 @@ export const CartProvider = ({ children }) => {
     setCartItems(updatedCart);
   };
 
+  const increaseQuantity = (index) => {
+    const updatedCart = [...cartItems];
+    updatedCart[index].cantidad += 1;
+    setCartItems(updatedCart);
+  };
+
+  const decreaseQuantity = (index) => {
+    const updatedCart = [...cartItems];
+    if (updatedCart[index].cantidad > 1) {
+      updatedCart[index].cantidad -= 1;
+      setCartItems(updatedCart);
+    } else {
+      removeFromCart(index);
+    }
+  };
+
+  const calculateTotal = () => {
+    return cartItems.reduce((total, item) => {
+      const price = typeof item.price === 'number' ? item.price : 0;
+      const cantidad = typeof item.cantidad === 'number' ? item.cantidad : 1;
+      return total + price * cantidad;
+    }, 0);
+  };
+
+  const clearCart = () => {
+    setCartItems([]);
+  };
+
+  const total = calculateTotal();
+
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart }}>
+    <CartContext.Provider
+      value={{
+        cartItems,
+        addToCart,
+        removeFromCart,
+        increaseQuantity,
+        decreaseQuantity,
+        total,
+        clearCart,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );

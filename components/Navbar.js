@@ -1,14 +1,13 @@
 'use client';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useSession, signIn, signOut } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { BsCartFill } from 'react-icons/bs';
 import { useContext } from 'react';
 import { CartContext } from '@/app/context/CartContext';
 
-
 const Navbar = () => {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const { cartItems } = useContext(CartContext);
 
   return (
@@ -23,13 +22,18 @@ const Navbar = () => {
           <Link href="/carrito" className="text-white relative">
             <BsCartFill size={24} />
             {cartItems.length > 0 && (
-              <span className="absolute -top-4  bg-yellow-300 text-red-600 rounded-full px-2 text-xs">
+              <span className="absolute -top-4 bg-yellow-300 text-red-600 rounded-full px-2 text-xs">
                 {cartItems.length}
               </span>
             )}
           </Link>
-          {session ? (
-            <button onClick={() => signOut()} className="text-white">Cerrar Sesión</button>
+          {status === 'authenticated' ? (
+            <div className="flex items-center space-x-2">
+              <span className="text-white">Hola, {session?.user?.name || "Usuario"}</span>
+              <button onClick={() => signOut()} className="text-white">
+                (Cerrar Sesión)
+              </button>
+            </div>
           ) : (
             <Link href="/registro" className="text-white">Iniciar Sesión</Link>
           )}

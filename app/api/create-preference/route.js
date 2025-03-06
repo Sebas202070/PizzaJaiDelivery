@@ -21,7 +21,7 @@ export async function POST(request) {
     const items = cartItems.map((item) => ({
       title: item.name,
       unit_price: item.price,
-      quantity: 1,
+      quantity: item.cantidad,
     }));
 
     console.log('items a enviar a Mercado Pago:', items); // Registro de depuración

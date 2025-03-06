@@ -1,19 +1,28 @@
-'use client';
+// app/layout.js
+'use client'; // Asegúrate de que es un componente de cliente
 import './globals.css';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { SessionProvider } from 'next-auth/react';
 import { CartProvider } from './context/CartContext';
+import { SessionProvider } from 'next-auth/react';
+
+
+
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html >
+      <head>
+        <title>Pizza Jai</title>
+        <meta name="description" content="Tu pizzería favorita en línea." />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </head>
       <body className="flex flex-col min-h-screen">
-        <SessionProvider>
+        <SessionProvider> {/* Envuelve tu aplicación con SessionProvider */}
           <CartProvider>
-          <Navbar />
-          <div className="flex-grow">{children}</div> {/* Agregado flex-grow */}
-          <Footer/>
+            <Navbar />
+            <div className="flex-grow">{children}</div>
+            <Footer />
           </CartProvider>
         </SessionProvider>
       </body>
