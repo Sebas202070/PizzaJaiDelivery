@@ -4,17 +4,17 @@ import { createUsuario, getUsuarios, getUsuarioPorEmail } from '@/lib/queries';
 
 export async function POST(request) {
   try {
-    const { username, email, password } = await request.json();
+    const {nombre, email, contraseña } = await request.json();
 
     // Validación de datos (ejemplo)
-    if (!username || !email || !password) {
+    if (!nombre || !email || !contraseña) {
       return NextResponse.json({ message: 'Todos los campos son requeridos' }, { status: 400 });
     }
 
     // Verificar si el usuario ya existe en la base de datos
     const usuarios = await getUsuarios();
     const existingUser = usuarios.find((user) => user.email === email);
-    const existingUsername = usuarios.find((user) => user.nombre === username);
+    const existingUsername = usuarios.find((user) => user.nombre === nombre);
 
     if (existingUser) {
       return NextResponse.json({ message: 'El correo electrónico ya está en uso' }, { status: 400 });
@@ -25,11 +25,11 @@ export async function POST(request) {
     }
 
     // Hash de la contraseña
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(contraseña, 10);
 
     // Crear el usuario en la base de datos
     const newUser = {
-      nombre: username,
+      nombre: nombre,
       email,
       contraseña: hashedPassword,
       rol: 'usuario',

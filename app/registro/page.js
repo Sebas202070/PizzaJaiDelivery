@@ -7,19 +7,39 @@ const Register = () => {
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
   const [contraseña, setContraseña] = useState('');
+  const [error, setError] = useState(null);
   const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Aquí iría la lógica para registrar al usuario
-    // ...
-    router.push('/login');
+    setError(null); // Limpiar errores previos
+
+    try {
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ nombre, email, contraseña }),
+      });
+
+      if (response.ok) {
+        router.push('/login');
+      } else {
+        const errorData = await response.json();
+        setError(errorData.message || 'Error al registrar el usuario.');
+      }
+    } catch (err) {
+      setError('Error al conectar con el servidor.');
+      console.error('Error en el registro:', err);
+    }
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 rounded shadow-md w-96">
         <h2 className="text-2xl font-semibold mb-4">Registro</h2>
+        {error && <p className="text-red-500 mb-4">{error}</p>} {/* Mostrar errores */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="text"
