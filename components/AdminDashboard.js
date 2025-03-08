@@ -1,75 +1,102 @@
+// components/AdminDashboard.js
 'use client';
-import { useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { useEffect, useState } from 'react';
 
-const AdminDashboard = ({ initialData }) => {
-  const [usuarios, setUsuarios] = useState(initialData.usuarios);
-  const [pedidos, setPedidos] = useState(initialData.pedidos);
+const AdminDashboard = () => {
+  const { data: session, status } = useSession();
+  const [pedidos, setPedidos] = useState([]);
+  const [usuarios, setUsuarios] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Agrupar pedidos por usuario
-  const pedidosPorUsuario = usuarios.map((usuario) => {
-    return {
-      ...usuario,
-      pedidos: pedidos.filter((pedido) => pedido.usuario.email === usuario.email),
-    };
-  });
+  useEffect(() => {
+    console.log('Session in AdminDashboard:', session);
 
-  return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6 text-center">Dashboard de Administrador</h1>
+    if (status === 'authenticated' && session?.user?.id) {
+      console.log('session.user.id:', session.user.id);
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {pedidosPorUsuario.map((usuario) => (
-          <div key={usuario._id} className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-xl font-semibold mb-4">Usuario: {usuario.nombre}</h2>
-            <p className="text-gray-600 mb-2">Email: {usuario.email}</p>
+      const fetchPedidos = async () => {
+        setIsLoading(true);
+        let url = '/api/pedidos';
 
-            {usuario.pedidos.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="min-w-full">
-                  <thead>
-                    <tr>
-                      <th className="py-2 px-4 border-b">Pedido #</th>
-                      <th className="py-2 px-4 border-b">Detalle</th>
-                      <th className="py-2 px-4 border-b">Total</th>
-                      <th className="py-2 px-4 border-b">Pagado</th>
-                      <th className="py-2 px-4 border-b">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {usuario.pedidos.map((pedido) => (
-                      <tr key={pedido._id}>
-                        <td className="py-2 px-4 border-b">{pedido._id.substring(20)}</td>
-                        <td className="py-2 px-4 border-b">
-                          {pedido.items.map((item) => (
-                            <div key={item.nombre}>
-                              {item.nombre} - ${item.precio} x {item.cantidad}
-                            </div>
-                          ))}
-                        </td>
-                        <td className="py-2 px-4 border-b">
-                          {pedido.total !== undefined && pedido.total !== null
-                            ? `$${pedido.total}`
-                            : 'N/A'}
-                        </td>
-                        <td className="py-2 px-4 border-b">{pedido.pagado ? 'Sí' : 'No'}</td>
-                        <td className="py-2 px-4 border-b">
-                          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded">
-                            Ver Detalles
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <p className="text-gray-500">No tiene pedidos.</p>
-            )}
-          </div>
-        ))}
+        if (session.user.rol === 'usuario') {
+          url += `?userId=${session.user.id}`;
+        }
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        console.log('Pedidos from API:', data);
+        setPedidos(data);
+        setIsLoading(false);
+      };
+
+      const fetchUsuarios = async () => {
+        if (session.user.rol === 'admin') {
+          const response = await fetch('/api/usuarios');
+          const data = await response.json();
+          setUsuarios(data);
+        }
+      };
+
+      fetchPedidos();
+      fetchUsuarios();
+    } else if (status === 'unauthenticated') {
+      setIsLoading(false);
+    }
+  }, [status, session]);
+
+  if (isLoading) {
+    return <p>Cargando...</p>;
+  }
+
+  if (status === 'unauthenticated') {
+    return <p>Acceso denegado. Inicia sesión para ver el dashboard.</p>;
+  }
+
+  if (session?.user?.rol === 'admin') {
+    return (
+      <div>
+        <h1>Dashboard de Administrador</h1>
+        <h2>Usuarios y sus Pedidos</h2>
+        <ul>
+          {usuarios.map((usuario) => (
+            <li key={usuario._id}>
+              <h3>{usuario.nombre} ({usuario.email})</h3>
+              <h4>Pedidos:</h4>
+              <ul>
+                {pedidos && Array.isArray(pedidos) && pedidos
+                  .filter((pedido) => {
+                    // Corrección: Accede a pedido.usuario.id.$oid
+                    console.log("Comparando:", pedido.usuario.id.$oid, usuario._id); // Log de depuración
+                    return pedido.usuario.id.$oid === usuario._id; // Asegúrate de que esta comparación sea correcta
+                  })
+                  .map((pedido) => (
+                    <li key={pedido._id}>
+                      Pedido #{pedido._id}: {pedido.items.map((producto) => producto.nombre).join(', ')} - Total: ${pedido.total}
+                    </li>
+                  ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
       </div>
-    </div>
-  );
+    );
+  } else {
+    return (
+      <div>
+        <h1>Dashboard</h1>
+        <h2>Mis Pedidos</h2>
+        <ul>
+          {pedidos && Array.isArray(pedidos) && pedidos.map((pedido) => (
+            <li key={pedido._id}>
+              Pedido #{pedido._id}: {pedido.items.map((producto) => producto.nombre).join(', ')} - Total: ${pedido.total}
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
 };
 
 export default AdminDashboard;

@@ -1,18 +1,17 @@
+// app/api/usuarios/route.js
+import clientPromise from '@/lib/db';
 import { NextResponse } from 'next/server';
-import { getUsuarios } from '@/lib/queries';
 
-export async function GET(request) {
+export async function GET() {
+  const client = await clientPromise;
+  const db = client.db('pizzas_jai');
+  const collection = db.collection('usuarios');
+
   try {
-    // Obtén todos los usuarios de la base de datos
-    const usuarios = await getUsuarios();
-
-    if (usuarios.length > 0) {
-      return NextResponse.json({ usuarios });
-    } else {
-      return NextResponse.json({ message: 'No se encontraron usuarios' }, { status: 404 });
-    }
+    const usuarios = await collection.find({}).toArray();
+    return NextResponse.json(usuarios);
   } catch (error) {
-    console.error('❌ Error al obtener los usuarios:', error);
-    return NextResponse.json({ message: 'Error interno del servidor' }, { status: 500 });
+    console.error('Error al obtener usuarios:', error);
+    return NextResponse.json({ error: 'Error al obtener usuarios' }, { status: 500 });
   }
 }

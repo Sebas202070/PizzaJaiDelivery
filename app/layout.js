@@ -9,6 +9,7 @@ import { SessionProvider } from 'next-auth/react';
 
 
 
+
 export default function RootLayout({ children }) {
   return (
     <html >
@@ -20,7 +21,10 @@ export default function RootLayout({ children }) {
       <body className="flex flex-col min-h-screen">
         <SessionProvider> {/* Envuelve tu aplicación con SessionProvider */}
           <CartProvider>
+          
             <Navbar />
+            
+
             <div className="flex-grow">{children}</div>
             <Footer />
           </CartProvider>

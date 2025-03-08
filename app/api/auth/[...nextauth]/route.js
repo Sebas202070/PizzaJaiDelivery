@@ -45,9 +45,10 @@ export const authOptions = {
             id: usuario._id.toString(),
             name: usuario.nombre,
             email: usuario.email,
+            rol: usuario.rol,
           };
 
-          console.log('authorize: Usuario autenticado correctamente:', user);
+          console.log('Authorize Callback user:', user);
           return user;
         } catch (error) {
           console.error('authorize: Error en authorize:', error);
@@ -58,9 +59,24 @@ export const authOptions = {
   ],
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
+    async session({ session, token, user }) {
+      console.log('Session Callback:', { session, token, user });
+      if (session?.user) {
+        session.user.rol = token.rol;
+        session.user.id = token.id; // Agrega el id a la sesión
+      }
+      return session;
+    },
+    async jwt({ token, user, account }) {
+      console.log('JWT Callback:', { token, user, account });
+      if (user) {
+        token.rol = user.rol;
+        token.id = user.id; // Agrega el id al token
+      }
+      return token;
+    },
     async signIn({ user, account, profile, email, credentials }) {
-      console.log('NEXTAUTH_SECRET:', process.env.NEXTAUTH_SECRET);
-      console.log('clientPromise:', clientPromise);
+      console.log('SignIn Callback:', { user, account, profile, email, credentials });
       return true;
     }
   }

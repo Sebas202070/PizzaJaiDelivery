@@ -5,6 +5,7 @@ import { useSession, signOut } from 'next-auth/react';
 import { BsCartFill } from 'react-icons/bs';
 import { useContext } from 'react';
 import { CartContext } from '@/app/context/CartContext';
+import UserMenu from '@/components/UserMenu'; // Importa UserMenu
 
 const Navbar = () => {
   const { data: session, status } = useSession();
@@ -28,12 +29,7 @@ const Navbar = () => {
             )}
           </Link>
           {status === 'authenticated' ? (
-            <div className="flex items-center space-x-2">
-              <span className="text-white">Hola, {session?.user?.name || "Usuario"}</span>
-              <button onClick={() => signOut()} className="text-white">
-                (Cerrar Sesión)
-              </button>
-            </div>
+            <UserMenu /> // Muestra UserMenu si está autenticado
           ) : (
             <Link href="/registro" className="text-white">Iniciar Sesión</Link>
           )}
