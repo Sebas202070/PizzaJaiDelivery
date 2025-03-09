@@ -23,7 +23,7 @@ const UserMenu = () => {
 
     return (
         <div className="relative flex flex-col items-center justify-center" ref={menuRef}>
-            <div className="mt-5"> {/* Ajustado el margen superior a mt-0 */}
+            <div className="mt-0"> {/* Ajustado el margen superior a mt-0 */}
                 <button
                     type="button"
                     className="inline-flex items-center justify-center rounded-full bg-indigo-600 p-2 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800"
@@ -61,7 +61,7 @@ const UserMenu = () => {
                         )}
                         {session.user.rol === 'usuario' && (
                             <Link
-                                href="/user/orders"
+                                href="/admin/dashboard"
                                 className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 text-center"
                                 role="menuitem"
                                 tabIndex="-1"
