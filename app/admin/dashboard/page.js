@@ -47,88 +47,140 @@ const Dashboard = () => {
     }, [status, session]);
 
     if (isLoading) {
-        return <p>Cargando...</p>;
+        return <p className="p-4">Cargando...</p>;
     }
 
     if (status === 'unauthenticated') {
-        return <p>Acceso denegado. Inicia sesión para ver el dashboard.</p>;
+        return <p className="p-4">Acceso denegado. Inicia sesión para ver el dashboard.</p>;
     }
 
     if (session?.user?.rol === 'admin') {
-        return (
-            <div>
-                <h1>Dashboard de Administrador</h1>
-                <h2>Usuarios y sus Pedidos</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Usuario</th>
-                            <th>Email</th>
-                            <th>Pedidos</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {usuarios.map((usuario) => (
-                            <tr key={usuario._id}>
-                                <td>{usuario.nombre}</td>
-                                <td>{usuario.email}</td>
-                                <td>
-                                    <ul>
-                                        {pedidos &&
-                                            Array.isArray(pedidos) &&
-                                            pedidos
-                                                .filter((pedido) => {
-                                                    console.log("Pedido siendo filtrado:", pedido);
-                                                    console.log("Objeto usuario:", pedido.usuario);
-                                                    console.log("ID usuario (pedidos):", pedido?.usuario?.id);
-                                                    console.log("ID usuario (usuarios):", usuario._id);
+        // Calcular estadísticas del administrador
+        const totalPedidos = pedidos.length;
+        const totalUsuarios = usuarios.length;
+        const totalVentas = pedidos.reduce((acc, pedido) => acc + pedido.total, 0);
 
-                                                    if (pedido?.usuario?.id) {
-                                                        let pedidoUserId = pedido.usuario.id;
-                                                        if (typeof pedidoUserId === 'string') {
-                                                            pedidoUserId = { $oid: pedidoUserId };
-                                                        }
-                                                        if (pedidoUserId?.$oid) {
-                                                            console.log(
-                                                                "Comparando:",
-                                                                pedidoUserId.$oid,
-                                                                usuario._id
-                                                            );
-                                                            return pedidoUserId.$oid === usuario._id;
-                                                        }
-                                                    }
-                                                    console.log("Pedido incompleto:", pedido);
-                                                    return false;
-                                                })
-                                                .map((pedido) => (
-                                                    <li key={pedido._id}>
-                                                        Pedido #{pedido._id}: {pedido.items.map((item) => item.nombre).join(", ")} - Total: $
-                                                        {pedido.total}
-                                                    </li>
-                                                ))}
-                                    </ul>
-                                </td>
+        return (
+            <div className="p-8 font-sans">
+                <h1 className="text-3xl font-bold mb-8 text-gray-800">Dashboard de Administrador</h1>
+
+                {/* Estadísticas Generales */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div className="bg-white p-6 rounded shadow">
+                        <h2 className="text-lg font-semibold mb-2">Total Pedidos</h2>
+                        <p className="text-3xl font-bold text-blue-600">{totalPedidos}</p>
+                    </div>
+                    <div className="bg-white p-6 rounded shadow">
+                        <h2 className="text-lg font-semibold mb-2">Total Usuarios</h2>
+                        <p className="text-3xl font-bold text-green-600">{totalUsuarios}</p>
+                    </div>
+                    <div className="bg-white p-6 rounded shadow">
+                        <h2 className="text-lg font-semibold mb-2">Total Ventas</h2>
+                        <p className="text-3xl font-bold text-indigo-600">${totalVentas}</p>
+                    </div>
+                </div>
+
+                {/* Tabla de Usuarios y Pedidos */}
+                <div className="bg-white rounded shadow p-6">
+                    <h2 className="text-2xl font-semibold mb-4">Usuarios y sus Pedidos</h2>
+                    <table className="w-full border-collapse">
+                        <thead>
+                            <tr className="bg-gray-100">
+                                <th className="p-3 text-left">Usuario</th>
+                                <th className="p-3 text-left">Email</th>
+                                <th className="p-3 text-left">Pedidos</th>
+                                <th className="p-3 text-left">Acciones</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {usuarios.map((usuario) => (
+                                <tr key={usuario._id} className="border-b border-gray-200">
+                                    <td className="p-3">{usuario.nombre}</td>
+                                    <td className="p-3">{usuario.email}</td>
+                                    <td className="p-3">
+                                        <ul className="list-none p-0">
+                                            {pedidos &&
+                                                Array.isArray(pedidos) &&
+                                                pedidos
+                                                    .filter((pedido) => {
+                                                        console.log("Pedido siendo filtrado:", pedido);
+                                                        console.log("Objeto usuario:", pedido.usuario);
+                                                        console.log("ID usuario (pedidos):", pedido?.usuario?.id);
+                                                        console.log("ID usuario (usuarios):", usuario._id);
+
+                                                        if (pedido?.usuario?.id) {
+                                                            let pedidoUserId = pedido.usuario.id;
+                                                            if (typeof pedidoUserId === 'string') {
+                                                                pedidoUserId = { $oid: pedidoUserId };
+                                                            }
+                                                            if (pedidoUserId?.$oid) {
+                                                                console.log(
+                                                                    "Comparando:",
+                                                                    pedidoUserId.$oid,
+                                                                    usuario._id
+                                                                );
+                                                                return pedidoUserId.$oid === usuario._id;
+                                                            }
+                                                        }
+                                                        console.log("Pedido incompleto:", pedido);
+                                                        return false;
+                                                    })
+                                                    .map((pedido) => (
+                                                        <li key={pedido._id} className="mb-2">
+                                                            Pedido #{pedido._id}: {pedido.items.map((item) => item.nombre).join(", ")} - ${pedido.total}
+                                                        </li>
+                                                    ))}
+                                        </ul>
+                                    </td>
+                                    <td className="p-3">
+                                        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                            Ver Detalles
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         );
     } else {
+        // Calcular estadísticas del usuario
+        const totalPedidos = pedidos.length;
+        const totalGastado = pedidos.reduce((acc, pedido) => acc + pedido.total, 0);
+
         return (
-            <div>
-                <h1>Dashboard</h1>
-                <h2>Mis Pedidos</h2>
-                <ul>
-                    {pedidos &&
-                        Array.isArray(pedidos) &&
-                        pedidos.map((pedido) => (
-                            <li key={pedido._id}>
-                                Pedido #{pedido._id}: {pedido.items.map((item) => item.nombre).join(", ")} - Total: $
-                                {pedido.total}
-                            </li>
-                        ))}
-                </ul>
+            <div className="p-8 font-sans">
+                <h1 className="text-3xl font-bold mb-8 text-gray-800">Dashboard</h1>
+
+                {/* Estadísticas del Usuario */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div className="bg-white p-6 rounded shadow">
+                        <h2 className="text-lg font-semibold mb-2">Total Pedidos</h2>
+                        <p className="text-3xl font-bold text-blue-600">{totalPedidos}</p>
+                    </div>
+                    <div className="bg-white p-6 rounded shadow">
+                        <h2 className="text-lg font-semibold mb-2">Total Gastado</h2>
+                        <p className="text-3xl font-bold text-green-600">${totalGastado}</p>
+                    </div>
+                </div>
+
+                {/* Lista de Pedidos del Usuario */}
+                <div className="bg-white rounded shadow p-6">
+                    <h2 className="text-2xl font-semibold mb-4">Mis Pedidos</h2>
+                    <ul className="list-none p-0">
+                        {pedidos &&
+                            Array.isArray(pedidos) &&
+                            pedidos.map((pedido) => (
+                                <li key={pedido._id} className="mb-4 border-b border-gray-200 pb-4">
+                                    <h3 className="text-lg font-semibold">Pedido #{pedido._id}</h3>
+                                    <p>
+                                        {pedido.items.map((item) => item.nombre).join(", ")} - Total: ${pedido.total}
+                                    </p>
+                                </li>
+                            ))}
+                    </ul>
+                </div>
             </div>
         );
     }
