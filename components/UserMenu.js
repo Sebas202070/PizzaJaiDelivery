@@ -21,6 +21,8 @@ const UserMenu = () => {
         setIsOpen(!isOpen);
     };
 
+    
+    
     return (
         <div className="relative flex flex-col items-center justify-center" ref={menuRef}>
             <div className="mt-0"> {/* Ajustado el margen superior a mt-0 */}
