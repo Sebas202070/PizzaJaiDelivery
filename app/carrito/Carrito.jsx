@@ -44,28 +44,38 @@ const Carrito = () => {
   const [showOrderSummary, setShowOrderSummary] = useState(false);
   const searchParams = useSearchParams();
   const [isAddressLoaded, setIsAddressLoaded] = useState(false);
+  const [retirarEnLocal, setRetirarEnLocal] = useState(false);
 
   useEffect(() => {
-    if (searchParams.get("edit") === "true") {
-      setShowAddressForm(true);
-    }
-  }, [searchParams]);
-
-  useEffect(() => {
-    if (address && Object.keys(address).length > 0) {
+    const storedAddress = localStorage.getItem("address");
+    if (storedAddress) {
+      try {
+        const parsedAddress = JSON.parse(storedAddress);
+        setFormAddress(parsedAddress);
+        setRetirarEnLocal(parsedAddress.retirarEnLocal || false);
+        setShowAddressForm(!parsedAddress.retirarEnLocal);
+      } catch (error) {
+        console.error(
+          "Carrito: Error al parsear datos de localStorage:",
+          error
+        );
+      }
+    } else if (address && Object.keys(address).length > 0) {
       setFormAddress(address);
-      setIsAddressLoaded(true);
-    } else {
-      setIsAddressLoaded(false);
+      setRetirarEnLocal(address.retirarEnLocal || false);
+      setShowAddressForm(!address.retirarEnLocal);
     }
-    console.log("Carrito: Datos de dirección del contexto:", address);
-    console.log("Carrito: Estado formAddress:", formAddress);
-  }, [address]);
+  }, [address]); // Dependencia en address para cargar datos del contexto
 
   const handleDeliveryOptionChange = (option) => {
     setDeliveryOption(option);
+    setRetirarEnLocal(option === "pickup"); // Actualizar retirarEnLocal
     setShowAddressForm(option === "delivery");
-    setShowOrderSummary(false); // Reiniciar el resumen al cambiar la opción de entrega
+    setShowOrderSummary(false);
+    setFormAddress((prevFormAddress) => ({
+      ...prevFormAddress,
+      retirarEnLocal: option === "pickup",
+    }));
   };
   const handleAddressChange = (e) => {
     const newFormAddress = { ...formAddress, [e.target.name]: e.target.value };
@@ -104,6 +114,7 @@ const Carrito = () => {
           if (emailResponse.ok) {
             console.log("Orden guardada y correo enviado.");
             // Limpiar el carrito o realizar otras acciones necesarias
+            localStorage.removeItem("address");
           } else {
             console.error("Error al enviar el correo.");
           }
@@ -116,8 +127,14 @@ const Carrito = () => {
     }
   };
   const handleContinue = () => {
-    console.log("Datos de dirección enviados al contexto:", formAddress);
-    updateAddress(formAddress); // Usa el nuevo estado local para actualizar el contexto
+    const updatedFormAddress = {
+      ...formAddress,
+      retirarEnLocal: deliveryOption === "pickup",
+    };
+    console.log("Datos de dirección enviados al contexto:", updatedFormAddress);
+    setAddress(updatedFormAddress);
+    updateAddress(updatedFormAddress);
+    localStorage.setItem("address", JSON.stringify(updatedFormAddress));
     router.push("/datos-envio");
   };
 
@@ -350,7 +367,7 @@ const Carrito = () => {
                         ))}
                       </ul>
                     </div>
-                    {deliveryOption === "delivery" && (
+                    {deliveryOption === "delivery" && showOrderSummary && (
                       <div>
                         <h3 className="text-lg font-semibold">
                           Datos de Envío:
@@ -368,7 +385,7 @@ const Carrito = () => {
                         </p>
                       </div>
                     )}
-                    {deliveryOption === "pickup" && (
+                    {deliveryOption === "pickup" && showOrderSummary && (
                       <div>
                         <h3 className="text-lg font-semibold">
                           Retiro en el local

@@ -1,6 +1,6 @@
 // app/context/EnvioContext.js
 'use client';
-import { createContext, useState } from 'react';
+import { createContext, useState, useEffect, useCallback, useMemo } from 'react';
 
 export const EnvioContext = createContext({});
 
@@ -13,16 +13,32 @@ export const EnvioProvider = ({ children }) => {
         postalCode: '',
         city: '',
         province: '',
+        retirarEnLocal: false,
     });
 
-    const updateAddress = (newAddress) => {
-        console.log("updateAddress llamado con:", newAddress)
+    useEffect(() => {
+        const storedAddress = localStorage.getItem('address');
+        if (storedAddress) {
+            setAddress(JSON.parse(storedAddress));
+        }
+    }, []);
+
+    useEffect(() => {
+        localStorage.setItem('address', JSON.stringify(address));
+    }, [address]);
+
+    const updateAddress = useCallback((newAddress) => {
+        console.log("EnvioContext: updateAddress llamado con:", newAddress);
         setAddress(newAddress);
-        console.log("Datos de dirección guardados en el contexto:", newAddress);
-    };
+        console.log("EnvioContext: Datos de dirección guardados en el contexto:", newAddress);
+    }, []);
+
+    const value = useMemo(() => ({ address, updateAddress }), [address, updateAddress]);
+
+    console.log("EnvioContext: address al renderizar:", address);
 
     return (
-        <EnvioContext.Provider value={{ address, updateAddress }}>
+        <EnvioContext.Provider value={value}>
             {children}
         </EnvioContext.Provider>
     );

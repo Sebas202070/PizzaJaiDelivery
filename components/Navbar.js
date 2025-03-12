@@ -12,21 +12,21 @@ const Navbar = () => {
     const { cartItems } = useContext(CartContext);
 
     return (
-        <nav className="bg-red-500 p-6 sticky top-0 z-10">
-            <div className="container mx-auto flex justify-between items-center">
+        <nav className="bg-red-500 p-4 md:p-6 sticky top-0 z-10">
+            <div className="container mx-auto flex justify-between items-center flex-wrap"> {/* Agregado flex-wrap */}
                 <Link href="/" className="flex items-center">
-                    <Image src="/images/pizza-jai-logo.jpg" alt="Pizza Jai Logo" width={70} height={70} className="mr-4" />
-                    <div className="flex flex-col"> {/* Contenedor para Pizza Jai y Delivery */}
-                        <span className="text-white font-bold text-3xl">Pizza Jai</span>
-                        <span className="text-white text-sm">Delivery</span>
+                    <Image src="/images/pizza-jai-logo.jpg" alt="Pizza Jai Logo" width={60} height={60} className="mr-2" />
+                    <div className="flex flex-col">
+                        <span className="text-white font-bold text-xl md:text-3xl">Pizza Jai</span> {/* Ajuste del tamaño del texto */}
+                        <span className="text-white text-xs">Delivery</span>
                     </div>
                 </Link>
-                <div className="flex items-center space-x-8">
-                    <Link href="/productos" className="text-white text-lg hover:text-red-200 transition-colors duration-200">Productos</Link>
+                <div className="flex items-center space-x-2 md:space-x-8"> {/* Ajuste del espacio */}
+                    <Link href="/productos" className="text-white text-sm md:text-lg hover:text-red-200 transition-colors duration-200">Productos</Link> {/* Ajuste del tamaño del texto */}
                     <Link href="/carrito" className="text-white relative hover:text-red-200 transition-colors duration-200">
-                        <BsCartFill size={30} />
+                    <BsCartFill size={window.innerWidth >= 768 ? 30 : 24} />
                         {cartItems.length > 0 && (
-                            <span className="absolute -top-4 right-0 bg-yellow-300 text-red-600 rounded-full px-2 text-xs">
+                            <span className="absolute -top-3 right-0 bg-yellow-300 text-red-600 rounded-full px-1 text-xs"> {/* Ajuste del padding */}
                                 {cartItems.length}
                             </span>
                         )}
@@ -36,7 +36,7 @@ const Navbar = () => {
                             <UserMenu />
                         </div>
                     ) : (
-                        <Link href="/registro" className="text-white text-lg hover:text-red-200 transition-colors duration-200">Iniciar Sesión</Link>
+                        <Link href="/registro" className="text-white text-sm md:text-lg hover:text-red-200 transition-colors duration-200">Iniciar Sesión</Link> 
                     )}
                 </div>
             </div>
