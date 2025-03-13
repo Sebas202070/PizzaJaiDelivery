@@ -53,7 +53,7 @@ const Carrito = () => {
         const parsedAddress = JSON.parse(storedAddress);
         setFormAddress(parsedAddress);
         setRetirarEnLocal(parsedAddress.retirarEnLocal || false);
-        setShowAddressForm(!parsedAddress.retirarEnLocal);
+        setShowAddressForm(!parsedAddress.retirarEnLocal); // Actualización aquí
       } catch (error) {
         console.error(
           "Carrito: Error al parsear datos de localStorage:",
@@ -63,14 +63,14 @@ const Carrito = () => {
     } else if (address && Object.keys(address).length > 0) {
       setFormAddress(address);
       setRetirarEnLocal(address.retirarEnLocal || false);
-      setShowAddressForm(!address.retirarEnLocal);
+      setShowAddressForm(!address.retirarEnLocal); // Actualización aquí
     }
-  }, [address]); // Dependencia en address para cargar datos del contexto
+  }, [address]);
 
   const handleDeliveryOptionChange = (option) => {
     setDeliveryOption(option);
-    setRetirarEnLocal(option === "pickup"); // Actualizar retirarEnLocal
-    setShowAddressForm(option === "delivery");
+    setRetirarEnLocal(option === "pickup");
+    setShowAddressForm(option === "delivery"); // Actualización aquí
     setShowOrderSummary(false);
     setFormAddress((prevFormAddress) => ({
       ...prevFormAddress,
@@ -224,7 +224,7 @@ const Carrito = () => {
                     Envío a domicilio
                   </label>
                 </div>
-                {showAddressForm && address && (
+                {showAddressForm && (
                   <div className="mt-4">
                     <h3 className="block font-semibold mb-2">
                       Dirección de Envío:

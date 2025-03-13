@@ -1,4 +1,3 @@
-// app/admin/dashboard/page.js
 'use client';
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
@@ -10,23 +9,15 @@ const Dashboard = () => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        console.log('Session in Dashboard:', session);
-
         if (status === 'authenticated' && session?.user?.id) {
-            console.log('session.user.id:', session.user.id);
-
             const fetchPedidos = async () => {
                 setIsLoading(true);
                 let url = '/api/pedidos';
-
-                if (session.user.rol === 'usuario') {
-                    url += `?userId=${session.user.id}`;
+                if (session.user.rol !== 'admin') {
+                    url = `/api/pedidos?userId=${session?.user?.id}`;
                 }
-
                 const response = await fetch(url);
                 const data = await response.json();
-
-                console.log('Pedidos from API:', data);
                 setPedidos(data);
                 setIsLoading(false);
             };
@@ -55,7 +46,6 @@ const Dashboard = () => {
     }
 
     if (session?.user?.rol === 'admin') {
-        // Calcular estadísticas del administrador
         const totalPedidos = pedidos.length;
         const totalUsuarios = usuarios.length;
         const totalVentas = pedidos.reduce((acc, pedido) => acc + pedido.total, 0);
@@ -64,7 +54,6 @@ const Dashboard = () => {
             <div className="p-8 font-sans">
                 <h1 className="text-3xl font-bold mb-8 text-gray-800">Dashboard de Administrador</h1>
 
-                {/* Estadísticas Generales */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div className="bg-white p-6 rounded shadow">
                         <h2 className="text-lg font-semibold mb-2">Total Pedidos</h2>
@@ -80,7 +69,6 @@ const Dashboard = () => {
                     </div>
                 </div>
 
-                {/* Tabla de Usuarios y Pedidos */}
                 <div className="bg-white rounded shadow p-6">
                     <h2 className="text-2xl font-semibold mb-4">Usuarios y sus Pedidos</h2>
                     <table className="w-full border-collapse">
@@ -89,6 +77,7 @@ const Dashboard = () => {
                                 <th className="p-3 text-left">Usuario</th>
                                 <th className="p-3 text-left">Email</th>
                                 <th className="p-3 text-left">Pedidos</th>
+                                <th className="p-3 text-left">Estado del Pago</th>
                                 <th className="p-3 text-left">Acciones</th>
                             </tr>
                         </thead>
@@ -102,32 +91,23 @@ const Dashboard = () => {
                                             {pedidos &&
                                                 Array.isArray(pedidos) &&
                                                 pedidos
-                                                    .filter((pedido) => {
-                                                        console.log("Pedido siendo filtrado:", pedido);
-                                                        console.log("Objeto usuario:", pedido.usuario);
-                                                        console.log("ID usuario (pedidos):", pedido?.usuario?.id);
-                                                        console.log("ID usuario (usuarios):", usuario._id);
-
-                                                        if (pedido?.usuario?.id) {
-                                                            let pedidoUserId = pedido.usuario.id;
-                                                            if (typeof pedidoUserId === 'string') {
-                                                                pedidoUserId = { $oid: pedidoUserId };
-                                                            }
-                                                            if (pedidoUserId?.$oid) {
-                                                                console.log(
-                                                                    "Comparando:",
-                                                                    pedidoUserId.$oid,
-                                                                    usuario._id
-                                                                );
-                                                                return pedidoUserId.$oid === usuario._id;
-                                                            }
-                                                        }
-                                                        console.log("Pedido incompleto:", pedido);
-                                                        return false;
-                                                    })
+                                                    .filter((pedido) => pedido.usuario.id === usuario._id)
                                                     .map((pedido) => (
                                                         <li key={pedido._id} className="mb-2">
-                                                            Pedido #{pedido._id}: {pedido.items.map((item) => item.nombre).join(", ")} - ${pedido.total}
+                                                            Pedido #{pedido._id}: {pedido.items.map((item) => item.nombre).join(', ')} - ${pedido.total}
+                                                        </li>
+                                                    ))}
+                                        </ul>
+                                    </td>
+                                    <td className="p-3">
+                                        <ul className="list-none p-0">
+                                            {pedidos &&
+                                                Array.isArray(pedidos) &&
+                                                pedidos
+                                                    .filter((pedido) => pedido.usuario.id === usuario._id)
+                                                    .map((pedido) => (
+                                                        <li key={pedido._id} className="mb-2">
+                                                            {pedido.pagado ? 'Pagado' : 'Pendiente'}
                                                         </li>
                                                     ))}
                                         </ul>
@@ -145,15 +125,14 @@ const Dashboard = () => {
             </div>
         );
     } else {
-        // Calcular estadísticas del usuario
-        const totalPedidos = pedidos.length;
-        const totalGastado = pedidos.reduce((acc, pedido) => acc + pedido.total, 0);
+        const userPedidos = pedidos.filter((pedido) => pedido.usuario.id === session?.user?.id);
+        const totalPedidos = userPedidos.length;
+        const totalGastado = userPedidos.reduce((acc, pedido) => acc + pedido.total, 0);
 
         return (
             <div className="p-8 font-sans">
                 <h1 className="text-3xl font-bold mb-8 text-gray-800">Dashboard</h1>
 
-                {/* Estadísticas del Usuario */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     <div className="bg-white p-6 rounded shadow">
                         <h2 className="text-lg font-semibold mb-2">Total Pedidos</h2>
@@ -165,20 +144,17 @@ const Dashboard = () => {
                     </div>
                 </div>
 
-                {/* Lista de Pedidos del Usuario */}
                 <div className="bg-white rounded shadow p-6">
                     <h2 className="text-2xl font-semibold mb-4">Mis Pedidos</h2>
                     <ul className="list-none p-0">
-                        {pedidos &&
-                            Array.isArray(pedidos) &&
-                            pedidos.map((pedido) => (
-                                <li key={pedido._id} className="mb-4 border-b border-gray-200 pb-4">
-                                    <h3 className="text-lg font-semibold">Pedido #{pedido._id}</h3>
-                                    <p>
-                                        {pedido.items.map((item) => item.nombre).join(", ")} - Total: ${pedido.total}
-                                    </p>
-                                </li>
-                            ))}
+                        {userPedidos.map((pedido) => (
+                            <li key={pedido._id} className="mb-4 border-b border-gray-200 pb-4">
+                                <h3 className="text-lg font-semibold">Pedido #{pedido._id}</h3>
+                                <p>
+                                    {pedido.items.map((item) => item.nombre).join(', ')} - Total: ${pedido.total} - Estado: {pedido.pagado ? 'Pagado' : 'Pendiente'}
+                                </p>
+                            </li>
+                        ))}
                     </ul>
                 </div>
             </div>

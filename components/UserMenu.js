@@ -1,26 +1,42 @@
 'use client';
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useContext } from 'react';
 import { UserCircleIcon } from '@heroicons/react/20/solid';
+import { CartContext } from '@/app/context/CartContext';
 
 const UserMenu = () => {
     const { data: session } = useSession();
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef(null);
+    const { clearCart } = useContext(CartContext);
 
     useEffect(() => {
-        // ... (código existente)
-    }, [menuRef]);
+      const handleClickOutside = (event) => {
+          if (menuRef.current && !menuRef.current.contains(event.target)) {
+              setIsOpen(false);
+          }
+      };
 
-    if (!session) {
-        return null;
-    }
+      document.addEventListener('mousedown', handleClickOutside);
 
-    const toggleMenu = () => {
-        setIsOpen(!isOpen);
-    };
+      return () => {
+          document.removeEventListener('mousedown', handleClickOutside);
+      };
+  }, [menuRef]);
 
+  if (!session) {
+      return null;
+  }
+
+  const toggleMenu = () => {
+      setIsOpen(!isOpen);
+  };
+
+  const handleSignOut = () => {
+      clearCart(); // Vaciar el carrito
+      signOut();
+  };
     
     
     return (
@@ -75,7 +91,7 @@ const UserMenu = () => {
                       </Link>
                   )}
                   <button
-                      onClick={() => signOut()}
+                      onClick={() => handleSignOut()}
                       className="block w-full px-4 py-3 text-center text-sm text-red-600 hover:bg-gray-100"
                       role="menuitem"
                       tabIndex="-1"
