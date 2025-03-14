@@ -4,6 +4,7 @@ import { useState, useEffect, useContext } from 'react';
 import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
 import { useSession } from 'next-auth/react';
 import { CartContext } from '@/app/context/CartContext';
+import { v4 as uuidv4 } from 'uuid'; // Importa uuidv4
 
 const MercadoPagoButton = ({ cartItems }) => {
     const [preferenceId, setPreferenceId] = useState(null);
@@ -32,12 +33,15 @@ const MercadoPagoButton = ({ cartItems }) => {
                     email: session.user.email,
                 };
 
+                const orderId = uuidv4(); // Genera el orderId aquí
+                console.log("OrderId Generado:", orderId);
+
                 const response = await fetch('/api/create-preference', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ cartItems, usuario }), // Incluye usuario aquí
+                    body: JSON.stringify({ cartItems, usuario, orderId }), // Incluye orderId aquí
                 });
 
                 if (!response.ok) {
@@ -55,7 +59,7 @@ const MercadoPagoButton = ({ cartItems }) => {
         };
 
         createPreference();
-    }, [cartItems, session]); // Agrega session como dependencia
+    }, [cartItems, session]);
 
     const handlePaymentStart = async () => {
         setLoading(true);

@@ -45,6 +45,16 @@ const Dashboard = () => {
         return <p className="p-4">Acceso denegado. Inicia sesión para ver el dashboard.</p>;
     }
 
+    const renderPedidoItems = (pedido) => {
+        return pedido.items.map((item) => item.nombre).join(', ');
+    };
+
+    const renderEstadoPago = (pedido) => {
+        const estado = pedido.pagado ? 'Pagado' : 'Pendiente';
+        const bgColor = pedido.pagado ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800';
+        return <span className={`p-1 rounded ${bgColor}`}>{estado}</span>;
+    };
+
     if (session?.user?.rol === 'admin') {
         const totalPedidos = pedidos.length;
         const totalUsuarios = usuarios.length;
@@ -94,7 +104,7 @@ const Dashboard = () => {
                                                     .filter((pedido) => pedido.usuario.id === usuario._id)
                                                     .map((pedido) => (
                                                         <li key={pedido._id} className="mb-2">
-                                                            Pedido #{pedido._id}: {pedido.items.map((item) => item.nombre).join(', ')} - ${pedido.total}
+                                                            Pedido #{pedido._id}: {renderPedidoItems(pedido)} - ${pedido.total}
                                                         </li>
                                                     ))}
                                         </ul>
@@ -107,7 +117,7 @@ const Dashboard = () => {
                                                     .filter((pedido) => pedido.usuario.id === usuario._id)
                                                     .map((pedido) => (
                                                         <li key={pedido._id} className="mb-2">
-                                                            {pedido.pagado ? 'Pagado' : 'Pendiente'}
+                                                            {renderEstadoPago(pedido)}
                                                         </li>
                                                     ))}
                                         </ul>
@@ -151,7 +161,7 @@ const Dashboard = () => {
                             <li key={pedido._id} className="mb-4 border-b border-gray-200 pb-4">
                                 <h3 className="text-lg font-semibold">Pedido #{pedido._id}</h3>
                                 <p>
-                                    {pedido.items.map((item) => item.nombre).join(', ')} - Total: ${pedido.total} - Estado: {pedido.pagado ? 'Pagado' : 'Pendiente'}
+                                    {renderPedidoItems(pedido)} - Total: ${pedido.total} - Estado: {renderEstadoPago(pedido)}
                                 </p>
                             </li>
                         ))}

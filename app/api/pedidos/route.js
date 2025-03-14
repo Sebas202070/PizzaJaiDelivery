@@ -22,8 +22,8 @@ export async function GET(req) {
         let pedidos;
 
         if (userId) {
-            console.log('userId:', userId);
-            console.log('userId from query:', userId);
+           /*  console.log('userId:', userId);
+            console.log('userId from query:', userId); */
 
             // Verificar autorización
             if (session.user.rol !== 'admin' && userId !== session.user.id) {
@@ -32,7 +32,7 @@ export async function GET(req) {
 
             try {
                 pedidos = await collection.find({ "usuario.id": userId }).toArray();
-                console.log('Pedidos encontrados:', pedidos);
+           /*      console.log('Pedidos encontrados:', pedidos); */
             } catch (error) {
                 console.error('Error filtering by userId:', error);
                 return NextResponse.json({ error: 'Error filtering by userId' }, { status: 500 });
@@ -45,7 +45,7 @@ export async function GET(req) {
             pedidos = await collection.find({}).toArray();
         }
 
-        console.log('API Response (pedidos):', pedidos);
+       /*  console.log('API Response (pedidos):', pedidos); */
         return NextResponse.json(pedidos);
     } catch (error) {
         console.error('Error al obtener pedidos:', error);
@@ -61,7 +61,7 @@ export async function POST(req) {
         }
 
         const pedido = await req.json();
-        console.log('Pedido recibido en /api/pedidos (POST):', pedido);
+     /*    console.log('Pedido recibido en /api/pedidos (POST):', pedido); */
 
         // Verificar autorización
         if (session.user.rol !== 'admin' && pedido.usuario.id !== session.user.id) {
@@ -83,7 +83,7 @@ export async function POST(req) {
             pagado: pedido.pagado,
         });
 
-        console.log('Pedido insertado con ID:', result.insertedId);
+       /*  console.log('Pedido insertado con ID:', result.insertedId); */
 
         return NextResponse.json({ message: 'Pedido guardado con éxito' }, { status: 200 });
     } catch (error) {
