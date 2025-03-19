@@ -46,7 +46,14 @@ const Dashboard = () => {
     }
 
     const renderPedidoItems = (pedido) => {
-        return pedido.items.map((item) => item.nombre).join(', ');
+        return pedido.items.map((item) => {
+            if (item.nombre) {
+                return item.nombre;
+            } else if (item.name) {
+                return item.name;
+            }
+            return 'Ítem desconocido'; // Manejar casos inesperados
+        }).join(', ');
     };
 
     const renderEstadoPago = (pedido) => {
@@ -101,10 +108,10 @@ const Dashboard = () => {
                                             {pedidos &&
                                                 Array.isArray(pedidos) &&
                                                 pedidos
-                                                    .filter((pedido) => pedido.usuario.id === usuario._id)
+                                                    .filter((pedido) => pedido.usuario && pedido.usuario.id === usuario._id) // Verificación aquí
                                                     .map((pedido) => (
                                                         <li key={pedido._id} className="mb-2">
-                                                            Pedido #{pedido._id}: {renderPedidoItems(pedido)} - ${pedido.total}
+                                                            Pedido #{pedido.orderId || pedido._id}: {renderPedidoItems(pedido)} - ${pedido.total}
                                                         </li>
                                                     ))}
                                         </ul>
@@ -114,7 +121,7 @@ const Dashboard = () => {
                                             {pedidos &&
                                                 Array.isArray(pedidos) &&
                                                 pedidos
-                                                    .filter((pedido) => pedido.usuario.id === usuario._id)
+                                                    .filter((pedido) => pedido.usuario && pedido.usuario.id === usuario._id) // Verificación aquí
                                                     .map((pedido) => (
                                                         <li key={pedido._id} className="mb-2">
                                                             {renderEstadoPago(pedido)}
@@ -135,7 +142,7 @@ const Dashboard = () => {
             </div>
         );
     } else {
-        const userPedidos = pedidos.filter((pedido) => pedido.usuario.id === session?.user?.id);
+        const userPedidos = pedidos.filter((pedido) => pedido.usuario && pedido.usuario.id === session?.user?.id); // Verificación aquí
         const totalPedidos = userPedidos.length;
         const totalGastado = userPedidos.reduce((acc, pedido) => acc + pedido.total, 0);
 
@@ -159,7 +166,7 @@ const Dashboard = () => {
                     <ul className="list-none p-0">
                         {userPedidos.map((pedido) => (
                             <li key={pedido._id} className="mb-4 border-b border-gray-200 pb-4">
-                                <h3 className="text-lg font-semibold">Pedido #{pedido._id}</h3>
+                                <h3 className="text-lg font-semibold">Pedido #{pedido.orderId || pedido._id}</h3>
                                 <p>
                                     {renderPedidoItems(pedido)} - Total: ${pedido.total} - Estado: {renderEstadoPago(pedido)}
                                 </p>

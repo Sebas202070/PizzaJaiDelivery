@@ -3,18 +3,22 @@ import { NextResponse } from 'next/server';
 import clientPromise from '@/lib/db';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../auth/[...nextauth]/route';
+import { ObjectId } from 'mongodb';
 
 export async function POST(request) {
     try {
         const data = await request.json();
-        const { cartItems, usuario } = data;
+        const { cartItems, usuario, orderId } = data;
 
-        console.log("Datos Recibidos:", data);
-        console.log("Usuario Recibido:", usuario);
-        console.log("Cart Items Recibidos:", cartItems);
+        console.log("Datos Recibidos para crear preferencia:", data);
+        console.log("Order ID Recibido:", orderId);
 
         if (!cartItems || !Array.isArray(cartItems)) {
             return NextResponse.json({ error: 'cartItems is missing or not an array' }, { status: 400 });
+        }
+
+        if (!orderId) {
+            return NextResponse.json({ error: 'orderId is missing' }, { status: 400 });
         }
 
         const client = new MercadoPagoConfig({
@@ -45,29 +49,12 @@ export async function POST(request) {
         const db = dbClient.db('pizzas_jai');
         const collection = db.collection('pedidos');
 
-        if (!usuario || typeof usuario !== 'object' || !usuario.id || !usuario.nombre || !usuario.email) {
-            console.error("Usuario no válido:", usuario);
-            return NextResponse.json({ error: 'Usuario no válido' }, { status: 400 });
-        }
-
-        const pedido = {
-            usuario: {
-                id: usuario.id,
-                nombre: usuario.nombre,
-                email: usuario.email,
-            },
-            items: cartItems,
-            total: cartItems.reduce((acc, item) => acc + item.price * item.cantidad, 0),
-            pagado: false,
-        };
-
         try {
-            const result = await collection.insertOne(pedido);
-            console.log("Pedido Insertado:", result);
-            const orderId = result.insertedId;
-            console.log("Order ID:", orderId);
-            console.log("Order ID (string):", orderId.toString()); // Log adicional 
-            console.log("Order ID:", orderId);
+            // Verificar si el pedido existe
+            const pedido = await collection.findOne({ _id: new ObjectId(orderId) });
+            if (!pedido) {
+                return NextResponse.json({ error: 'Pedido no encontrado' }, { status: 404 });
+            }
 
             const preferenceResult = await preference.create({
                 body: {
@@ -79,6 +66,7 @@ export async function POST(request) {
                     },
                     notification_url: "https://pizza-jai.vercel.app/api/webhook-mercadopago",
                     auto_return: 'approved',
+                    external_reference: orderId.toString(), // Usar orderId como referencia externa
                     metadata: {
                         order_id: orderId.toString(),
                     },
@@ -88,13 +76,11 @@ export async function POST(request) {
             console.log("Preferencia Creada:", preferenceResult);
             return NextResponse.json({ preferenceId: preferenceResult.id });
         } catch (dbError) {
-            console.error("Error al insertar en la base de datos:", dbError);
-            return NextResponse.json({ error: 'Error al insertar en la base de datos' }, { status: 500 });
+            console.error("Error al interactuar con la base de datos:", dbError);
+            return NextResponse.json({ error: 'Error al interactuar con la base de datos' }, { status: 500 });
         }
     } catch (error) {
         console.error('Error al crear la preferencia:', error);
         return NextResponse.json({ error: 'Error al crear la preferencia' }, { status: 500 });
     }
 }
-
-// /api/webhook-mercadopago/route.js
