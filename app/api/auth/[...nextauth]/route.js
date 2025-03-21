@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import clientPromise from '@/lib/db';
+import clientPromise from '@/lib/db.mjs';
 import bcrypt from 'bcrypt';
 
 export const authOptions = {

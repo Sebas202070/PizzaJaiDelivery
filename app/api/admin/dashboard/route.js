@@ -1,5 +1,5 @@
 // app/api/admin/dashboard/route.js
-import clientPromise from '@/lib/db'; // Asegúrate de tener tu conexión a MongoDB
+import clientPromise from '@/lib/db.mjs'; // Asegúrate de tener tu conexión a MongoDB
 import { NextResponse } from 'next/server';
 
 export async function GET() {

@@ -1,5 +1,5 @@
 // app/api/usuarios/route.js
-import clientPromise from '@/lib/db';
+import clientPromise from '@/lib/db.mjs';
 import { NextResponse } from 'next/server';
 
 export async function GET() {

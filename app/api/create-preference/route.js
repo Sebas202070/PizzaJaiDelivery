@@ -1,6 +1,6 @@
 import { MercadoPagoConfig, Preference } from 'mercadopago';
 import { NextResponse } from 'next/server';
-import clientPromise from '@/lib/db';
+import clientPromise from '@/lib/db.mjs';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../auth/[...nextauth]/route';
 import { ObjectId } from 'mongodb';
