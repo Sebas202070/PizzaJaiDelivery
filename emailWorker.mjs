@@ -66,17 +66,20 @@ emailQueue.process(async (job) => {
             to: pedido.usuario.email,
             subject: 'Tu pago ha sido aprobado',
             text: `¡Hola ${pedido.usuario.nombre}!
-        
-        Tu pago ha sido aprobado. Aquí está el detalle de tu pedido:
-        
-        Dirección de envío: ${pedido.direccionEnvio || 'No proporcionada'}
-        
-        Pedido:
-        ${pedido.items.map(item => `- ${item.cantidad} x ${item.nombre} - $${item.precio}`).join('\n')}
-        
-        Total: $${pedido.total}
-        
-        ¡Gracias por tu compra!`,
+            
+            Tu pago ha sido aprobado. Aquí está el detalle de tu pedido:
+            
+            Dirección de envío: 
+            Calle: ${pedido.address?.street || 'No proporcionada'} ${pedido.address?.number || ''}
+            Piso: ${pedido.address?.floor || 'No proporcionado'}, Departamento: ${pedido.address?.apartment || 'No proporcionado'}
+            Código Postal: ${pedido.address?.postalCode || 'No proporcionado'}, Ciudad: ${pedido.address?.city || 'No proporcionada'}, Provincia: ${pedido.address?.province || 'No proporcionada'}
+            
+            Pedido:
+            ${pedido.items.map(item => `- ${item.cantidad} x ${item.nombre} - $${item.precio}`).join('\n')}
+            
+            Total: $${pedido.total}
+            
+            ¡Gracias por tu compra!`,
         };
         console.log('Opciones de correo electrónico:', mailOptions);
 

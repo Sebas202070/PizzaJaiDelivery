@@ -79,6 +79,7 @@ export async function POST(req) {
             items: pedido.items,
             total: pedido.total,
             pagado: pedido.pagado,
+            address: pedido.address, // Incluye la información del domicilio
         });
 
         console.log('Pedido insertado con ID:', result.insertedId);

@@ -13,7 +13,6 @@ import Image from 'next/image';
 const DatosEnvio = () => {
     const { address, updateAddress } = useContext(EnvioContext);
     const { cartItems, total, clearCart } = useContext(CartContext);
-    const [localAddress, setLocalAddress] = useState(address || {});
     const router = useRouter();
     const [showPaymentOptions, setShowPaymentOptions] = useState(false);
     const [paymentOption, setPaymentOption] = useState(null);
@@ -24,17 +23,7 @@ const DatosEnvio = () => {
     const isProcessing = useRef(false);
     const [orderId, setOrderId] = useState(null);
 
-    useEffect(() => {
-        setLocalAddress(address || {});
-    }, [address]);
-
-    const handleAddressChange = (e) => {
-        setLocalAddress({ ...localAddress, [e.target.name]: e.target.value });
-    };
-
     const handleConfirm = async () => {
-        console.log("handleConfirm called. isProcessing:", isProcessing.current);
-
         if (isProcessing.current) {
             console.log("Pedido en proceso, evitando duplicado.");
             return;
@@ -51,8 +40,6 @@ const DatosEnvio = () => {
         setPaymentError(null);
 
         try {
-            console.log('Total antes de crear pedido:', total);
-            console.log('Tipo de dato de total:', typeof total);
             const pedido = {
                 usuario: {
                     id: session.user.id,
@@ -66,9 +53,8 @@ const DatosEnvio = () => {
                 })),
                 total,
                 pagado: false,
-                address: localAddress,
+                address: address, // Utiliza directamente address del contexto
             };
-            console.log('Pedido a guardar:', pedido);
 
             const response = await fetch('/api/pedidos', {
                 method: 'POST',
@@ -93,7 +79,6 @@ const DatosEnvio = () => {
         } finally {
             setPaymentLoading(false);
             isProcessing.current = false;
-            console.log("handleConfirm completed. isProcessing:", isProcessing.current);
         }
     };
 
@@ -123,7 +108,7 @@ const DatosEnvio = () => {
         <div className="min-h-screen bg-gray-100 py-8">
             <div className="container mx-auto px-4">
                 <div className="flex justify-between items-start">
-                <div className="w-1/2 mr-4">
+                    <div className="w-1/2 mr-4">
                         <h2 className="text-3xl font-bold mb-6">Resumen de la Orden</h2>
                         <div className="bg-white rounded-lg shadow-md p-6 mb-4">
                             <h3 className="text-xl font-semibold mb-4">Productos:</h3>
@@ -139,16 +124,16 @@ const DatosEnvio = () => {
                         </div>
 
                         <div className="bg-white rounded-lg shadow-md p-6 mb-4">
-                            {localAddress.retirarEnLocal ? (
+                            {address.retirarEnLocal ? (
                                 <div>
                                     <h3 className="text-xl font-semibold mb-4">Retiro en el local</h3>
                                 </div>
                             ) : (
                                 <div>
                                     <h3 className="text-xl font-semibold mb-4">Datos de Envío:</h3>
-                                    <p>Calle: {localAddress.street} {localAddress.number}</p>
-                                    <p>Piso: {localAddress.floor}, Departamento: {localAddress.apartment}</p>
-                                    <p>Código Postal: {localAddress.postalCode}, Ciudad: {localAddress.city}, Provincia: {localAddress.province}</p>
+                                    <p>Calle: {address.street} {address.number}</p>
+                                    <p>Piso: {address.floor}, Departamento: {address.apartment}</p>
+                                    <p>Código Postal: {address.postalCode}, Ciudad: {address.city}, Provincia: {address.province}</p>
                                 </div>
                             )}
                         </div>
