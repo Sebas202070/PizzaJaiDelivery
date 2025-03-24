@@ -68,10 +68,7 @@ export async function POST(req) {
 
                 if (updateResult.modifiedCount === 0) {
                     console.error('Pedido no encontrado o ya actualizado');
-                    return NextResponse.json(
-                        { error: 'Pedido no encontrado o ya actualizado' },
-                        { status: 404 }
-                    );
+                    // Elimina el return NextResponse.json(...)
                 }
 
                 console.log('Pedido actualizado a pagado');
