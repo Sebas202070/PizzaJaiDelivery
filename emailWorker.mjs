@@ -61,6 +61,9 @@ emailQueue.process(async (job) => {
             // No loguees la contraseña por seguridad
         });
 
+        // Agregar log de depuración para pedido.address
+        console.log('Pedido address antes de mailOptions:', pedido.address);
+
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: pedido.usuario.email,
@@ -70,9 +73,11 @@ emailQueue.process(async (job) => {
             Tu pago ha sido aprobado. Aquí está el detalle de tu pedido:
             
             Dirección de envío: 
-            Calle: ${pedido.address?.street || 'No proporcionada'} ${pedido.address?.number || ''}
-            Piso: ${pedido.address?.floor || 'No proporcionado'}, Departamento: ${pedido.address?.apartment || 'No proporcionado'}
-            Código Postal: ${pedido.address?.postalCode || 'No proporcionado'}, Ciudad: ${pedido.address?.city || 'No proporcionada'}, Provincia: ${pedido.address?.province || 'No proporcionada'}
+            ${pedido.address && typeof pedido.address === 'object' ? `
+            Calle: ${pedido.address.street ? pedido.address.street : 'No proporcionada'} ${pedido.address.number ? pedido.address.number : ''}
+            Piso: ${pedido.address.floor ? pedido.address.floor : 'No proporcionado'}, Departamento: ${pedido.address.apartment ? pedido.address.apartment : 'No proporcionado'}
+            Código Postal: ${pedido.address.postalCode ? pedido.address.postalCode : 'No proporcionado'}, Ciudad: ${pedido.address.city ? pedido.address.city : 'No proporcionada'}, Provincia: ${pedido.address.province ? pedido.address.province : 'No proporcionada'}
+            ` : 'No proporcionada'}
             
             Pedido:
             ${pedido.items.map(item => `- ${item.cantidad} x ${item.nombre} - $${item.precio}`).join('\n')}
