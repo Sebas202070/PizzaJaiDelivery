@@ -7,30 +7,45 @@ import { ObjectId } from 'mongodb';
 import emailQueue from './utils/emailQueue.mjs';
 
 emailQueue.process(async (job) => {
-    console.log('Trabajo recibido en emailWorker:', JSON.stringify(job.data, null, 2)); // Log adicional
+    console.log('Trabajo recibido en emailWorker:', JSON.stringify(job.data, null, 2));
     const { orderId } = job.data;
 
-    const client = await clientPromise;
-    if (!client) {
-        console.error('Error al conectar a MongoDB'); // Log adicional
-        return;
-    }
-    console.log('Conexión a MongoDB establecida'); // Log adicional
-
-    const db = client.db('pizzas_jai');
-    const collection = db.collection('pedidos');
-    const pedido = await collection.findOne({ _id: new ObjectId(orderId) });
-
-    console.log('Consulta a MongoDB:', { _id: new ObjectId(orderId) }); // Log adicional
-    console.log('Pedido recuperado:', pedido); // Log adicional
-
-    if (!pedido) {
-        console.error(`Pedido no encontrado para el trabajo ${job.id}`);
-        return;
-    }
-
     try {
-        console.log('Intentando enviar correo electrónico...'); // Log adicional
+        const client = await clientPromise;
+        if (!client) {
+            console.error('Error al conectar a MongoDB');
+            return;
+        }
+        console.log('Conexión a MongoDB establecida');
+
+        const db = client.db('pizzas_jai');
+        const collection = db.collection('pedidos');
+        const pedido = await collection.findOne({ _id: new ObjectId(orderId) });
+
+        console.log('Consulta a MongoDB:', { _id: new ObjectId(orderId) });
+        console.log('Pedido recuperado:', pedido);
+
+        if (!pedido) {
+            console.error(`Pedido no encontrado para el trabajo ${job.id}`);
+            return;
+        }
+
+        if (!pedido.usuario || !pedido.usuario.email) {
+            console.error(`Datos de usuario incompletos para el pedido ${orderId}`);
+            return;
+        }
+
+        if (!pedido.items || pedido.items.length === 0) {
+            console.error(`Datos de items incompletos para el pedido ${orderId}`);
+            return;
+        }
+
+        if (!pedido.total) {
+            console.error(`Datos de total incompletos para el pedido ${orderId}`);
+            return;
+        }
+
+        console.log('Intentando enviar correo electrónico...');
         const transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',
             port: 587,
@@ -41,24 +56,36 @@ emailQueue.process(async (job) => {
                 pass: process.env.EMAIL_PASS,
             },
         });
-        console.log('Configuración de Nodemailer:', { // Log adicional
+        console.log('Configuración de Nodemailer:', {
             user: process.env.EMAIL_USER,
             // No loguees la contraseña por seguridad
         });
 
         const mailOptions = {
             from: process.env.EMAIL_USER,
-            to: 'sebastianrnajleok@gmail.com', // Cambiar a pedido.usuario.email cuando este disponible.
+            to: pedido.usuario.email,
             subject: 'Tu pago ha sido aprobado',
-            text: 'hola', // Cambiar por el texto del mail que necesites.
+            text: `¡Hola ${pedido.usuario.nombre}!
+        
+        Tu pago ha sido aprobado. Aquí está el detalle de tu pedido:
+        
+        Dirección de envío: ${pedido.direccionEnvio || 'No proporcionada'}
+        
+        Pedido:
+        ${pedido.items.map(item => `- ${item.cantidad} x ${item.nombre} - $${item.precio}`).join('\n')}
+        
+        Total: $${pedido.total}
+        
+        ¡Gracias por tu compra!`,
         };
-        console.log('Opciones de correo electrónico:', mailOptions); // Log adicional
+        console.log('Opciones de correo electrónico:', mailOptions);
 
         const info = await transporter.sendMail(mailOptions);
         console.log(`Correo electrónico enviado para el trabajo ${job.id}:`, info);
+
     } catch (error) {
-        console.error(`Error al enviar el correo electrónico para el trabajo ${job.id}:`, error);
-        if (error.response) { // Log adicional
+        console.error(`Error al procesar el trabajo ${job.id}:`, error);
+        if (error.response) {
             console.error('Respuesta de Nodemailer:', error.response);
         }
     }
