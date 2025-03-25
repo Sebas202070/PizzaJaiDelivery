@@ -64,7 +64,7 @@ export async function POST(request) {
                         failure: `${process.env.NEXT_PUBLIC_URL}/failure`,
                         pending: `${process.env.NEXT_PUBLIC_URL}/pending`,
                     },
-                    notification_url: "https://104c-161-0-64-94.ngrok-free.app/api/webhook-mercadopago",
+                    notification_url: "https://pizza-jai.vercel.app/api/webhook-mercadopago",
                     auto_return: 'approved',
                     external_reference: orderId.toString(), // Usar orderId como referencia externa
                     metadata: {
