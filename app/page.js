@@ -4,7 +4,7 @@ import PizzaCard from '../components/PizzaCard';
 const pizzas = [
   {
     id: 1,
-    name: 'Margarita',
+    name: 'Margarit',
     description: 'Tomate, mozzarella, albahaca',
     price: 2500,
     image: '/images/margarita.jpg',
@@ -78,7 +78,7 @@ export default function Home() {
         <h1 className="text-white text-6xl font-bold text-center text-shadow-black">Bienvenido a Pizza Jai Delivery</h1>
         <h2 className="text-white text-3xl font-bold mt-4 text-center text-shadow-black">Elegi de entre mas de nuestras 20 exquisitas variedades</h2>
         <h2 className="text-white text-3xl font-bold mt-4 text-center text-shadow-black">¡y hace tu pedido ya!</h2>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8 mb-12">
           {pizzas.map((pizza) => (
             <PizzaCard key={pizza.id} pizza={pizza} />

@@ -14,7 +14,7 @@ const pizzas = [
   },
   {
     id: 2,
-    name: 'Pepperoni',
+    name: 'Pepperon',
     description: 'Tomate, mozzarella, pepperoni',
     price: 2000,
     image: '/images/pepperoni.jpg',
