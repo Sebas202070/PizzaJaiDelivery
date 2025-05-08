@@ -4,7 +4,7 @@ import PizzaCard from '../components/PizzaCard';
 const pizzas = [
   {
     id: 1,
-    name: 'Margarit',
+    name: 'Margarita',
     description: 'Tomate, mozzarella, albahaca',
     price: 2500,
     image: '/images/margarita.jpg',
