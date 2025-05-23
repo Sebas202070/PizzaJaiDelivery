@@ -60,11 +60,11 @@ export async function POST(request) {
                 body: {
                     items: items,
                     back_urls: {
-                        success: "https://pizza-jai.vercel.app",
+                        success: "https://pizzajai.shop/",
                         failure: `${process.env.NEXT_PUBLIC_URL}/failure`,
                         pending: `${process.env.NEXT_PUBLIC_URL}/pending`,
                     },
-                    notification_url: "https://pizza-jai.vercel.app/api/webhook-mercadopago",
+                    notification_url: "https://pizzajai.shop/api/webhook-mercadopago",
                     auto_return: 'approved',
                     external_reference: orderId.toString(), // Usar orderId como referencia externa
                     metadata: {
